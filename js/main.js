@@ -1,16 +1,46 @@
-alert('Bienvenido usuario, favor de hacer click en Aceptar para continuar...')
-let nombre = prompt('Ingrese su nombre: ')
-console.log('Bienvenido ' + nombre)
+alert('Bienvenido usuario, favor de hacer click en Aceptar para continuar...');
 
-function inicioPrograma(){
+let nombre = prompt('Ingrese su nombre: ');
+console.log('Bienvenido ' + nombre);
+
+function inicioPrograma() {
     let opcionElegida = parseInt(prompt(
-        'Elija una opcion deseada entre las siguientes opciones:\n'+
-            '1. Agregar productos\n'+
-            '2. Ver carrito\n'+
-            '3. Eliminar productos\n'+
-            '4. Salir'))
-            return opcionElegida;
+        'Elija una opción deseada entre las siguientes:\n' +
+        '1. Agregar productos\n' +
+        '2. Ver carrito\n' +
+        '3. Eliminar productos\n' +
+        '4. Salir'));
+    return opcionElegida;
+}
+
+function mostrarProductosDisponibles() {
+    let lista = 'Productos disponibles:\n';
+    lista += Object.entries(productos)
+        .map(([id, nombre]) => `${id}. ${nombre}`)
+        .join('\n');
+    return lista;
+}
+
+function eliminarProductoDelCarrito() {
+    if (carrito.length === 0) {
+        alert("El carrito está vacío.");
+        return;
     }
+
+    let mensaje = 'Carrito actual:\n';
+    carrito.forEach((producto, index) => {
+        mensaje += `${index + 1}. ${producto}\n`;
+    });
+
+    let indice = parseInt(prompt(mensaje + "Ingrese el número del producto a eliminar:")) - 1;
+
+    if (indice >= 0 && indice < carrito.length) {
+        let eliminado = carrito.splice(indice, 1);
+        alert(`Se eliminó: ${eliminado}`);
+    } else {
+        alert("Índice inválido.");
+    }
+}
 
 const productos = {
     1: 'banana',
@@ -20,49 +50,48 @@ const productos = {
     5: 'pollo',
     6: 'gaseosa',
     7: 'agua'
-}
+};
 
 let carrito = [];
+let respuesta;
 
 do {
     respuesta = inicioPrograma();
 
-    if (respuesta !== 4);{
+    if (respuesta !== 4) {
         switch (respuesta) {
-        case 1:
-            let lista = 'Que productos desea agregar? Separe los numeros por coma\n';
-            lista += Object.entries(productos).map(([id, nombre]) => `${id}. ${nombre}`)
-            .join('\n');
-            let seleccion = prompt(lista);
-            let listaIds = seleccion.split(',').map(id => id.trim());
-            carrito = listaIds.map(id => productos[id]);
-            console.log('Carrito: ', carrito)
-            //inicioPrograma();
-            break;
-        
-        case 2:
-            alert(carrito);
-            //inicioPrograma();
-            break;
-        
-        case 3:
-            let itemAEliminar = 'Que producto desea eliminar?\n'
-            console.log(carrito)
-            itemAEliminar = parseInt(prompt());
-            carrito.map=carrito.splice(itemAEliminar);
-            //inicioPrograma();
-            break;
+            case 1:
+                let listaProductos = mostrarProductosDisponibles();
+                listaProductos += '\nIngrese los números de los productos que desea agregar, separados por coma:';
 
-        case 4:
-            alert('Gracias por usar el programa');
-            break;
-        
-    default:
-            alert('Opcion elegida incorrecta!!!');
+                let seleccion = prompt(listaProductos);
+                let listaIds = seleccion.split(',').map(id => id.trim());
 
+                listaIds.forEach(id => {
+                    if (productos[id]) carrito.push(productos[id]);
+                });
 
+                console.log('Carrito: ', carrito);
+                break;
 
+            case 2:
+                if (carrito.length === 0) {
+                    alert("El carrito está vacío.");
+                } else {
+                    alert("Carrito: " + carrito.join(', '));
+                }
+                console.log('Carrito nuevo: ', carrito)
+                break;
+
+            case 3:
+                eliminarProductoDelCarrito();
+                break;
+
+            default:
+                alert('Opción elegida incorrecta.');
         }
+    } else {
+        alert('Gracias por usar el programa');
     }
-}   while (respuesta!==4);
 
+} while (respuesta !== 4);
