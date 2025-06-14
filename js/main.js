@@ -1,97 +1,81 @@
-alert('Bienvenido usuario, favor de hacer click en Aceptar para continuar...');
+const productos = [
+  { id: 1, nombre: 'Banana', precio: 200 },
+  { id: 2, nombre: 'Manzana', precio: 250 },
+  { id: 3, nombre: 'Naranja', precio: 180 },
+  { id: 4, nombre: 'Carne', precio: 1800 },
+  { id: 5, nombre: 'Pollo', precio: 1400 },
+  { id: 6, nombre: 'Gaseosa', precio: 700 },
+  { id: 7, nombre: 'Agua', precio: 400 }
+];
 
-let nombre = prompt('Ingrese su nombre: ');
-console.log('Bienvenido ' + nombre);
+let carrito = JSON.parse(localStorage.getItem('carrito')) || [];
 
-function inicioPrograma() {
-    let opcionElegida = parseInt(prompt(
-        'Elija una opción deseada entre las siguientes:\n' +
-        '1. Agregar productos\n' +
-        '2. Ver carrito\n' +
-        '3. Eliminar productos\n' +
-        '4. Salir'));
-    return opcionElegida;
+const contenedorProductos = document.getElementById('productos');
+const listaCarrito = document.getElementById('carrito');
+const btnVaciar = document.getElementById('vaciarCarrito');
+const inputBuscador = document.getElementById('buscador');
+const totalElemento = document.getElementById('total');
+
+function renderProductos(lista = productos) {
+  contenedorProductos.innerHTML = '';
+  lista.forEach(producto => {
+    const div = document.createElement('div');
+    div.innerHTML = `
+      <p><strong>${producto.nombre}</strong> - $${producto.precio}</p>
+      <button onclick="agregarAlCarrito(${producto.id})">Agregar</button>
+    `;
+    contenedorProductos.appendChild(div);
+  });
 }
 
-function mostrarProductosDisponibles() {
-    let lista = 'Productos disponibles:\n';
-    lista += Object.entries(productos)
-        .map(([id, nombre]) => `${id}. ${nombre}`)
-        .join('\n');
-    return lista;
+function renderCarrito() {
+  listaCarrito.innerHTML = '';
+  let total = 0;
+
+  carrito.forEach((item, index) => {
+    total += item.precio * item.cantidad;
+    const li = document.createElement('li');
+    li.innerHTML = `
+      ${item.nombre} x${item.cantidad} - $${item.precio * item.cantidad}
+      <button onclick="eliminarDelCarrito(${index})">Eliminar</button>
+    `;
+    listaCarrito.appendChild(li);
+  });
+
+  totalElemento.textContent = `Total a pagar: $${total}`;
+  localStorage.setItem('carrito', JSON.stringify(carrito));
 }
 
-function eliminarProductoDelCarrito() {
-    if (carrito.length === 0) {
-        alert("El carrito está vacío.");
-        return;
-    }
+function agregarAlCarrito(id) {
+  const producto = productos.find(p => p.id === id);
+  const itemEnCarrito = carrito.find(item => item.id === id);
 
-    let mensaje = 'Carrito actual:\n';
-    carrito.forEach((producto, index) => {
-        mensaje += `${index + 1}. ${producto}\n`;
-    });
+  if (itemEnCarrito) {
+    itemEnCarrito.cantidad++;
+  } else {
+    carrito.push({ ...producto, cantidad: 1 });
+  }
 
-    let indice = parseInt(prompt(mensaje + "Ingrese el número del producto a eliminar:")) - 1;
-
-    if (indice >= 0 && indice < carrito.length) {
-        let eliminado = carrito.splice(indice, 1);
-        alert(`Se eliminó: ${eliminado}`);
-    } else {
-        alert("Índice inválido.");
-    }
+  renderCarrito();
 }
 
-const productos = {
-    1: 'banana',
-    2: 'manzana',
-    3: 'naranja',
-    4: 'carne',
-    5: 'pollo',
-    6: 'gaseosa',
-    7: 'agua'
+function eliminarDelCarrito(index) {
+  carrito.splice(index, 1);
+  renderCarrito();
+}
+
+btnVaciar.onclick = () => {
+  carrito = [];
+  renderCarrito();
 };
 
-let carrito = [];
-let respuesta;
+inputBuscador.addEventListener('input', () => {
+  const texto = inputBuscador.value.toLowerCase();
+  const productosFiltrados = productos.filter(p =>
+    p.nombre.toLowerCase().includes(texto)
+  );
+  renderProductos(productosFiltrados);
+});
 
-do {
-    respuesta = inicioPrograma();
-
-    if (respuesta !== 4) {
-        switch (respuesta) {
-            case 1:
-                let listaProductos = mostrarProductosDisponibles();
-                listaProductos += '\nIngrese los números de los productos que desea agregar, separados por coma:';
-
-                let seleccion = prompt(listaProductos);
-                let listaIds = seleccion.split(',').map(id => id.trim());
-
-                listaIds.forEach(id => {
-                    if (productos[id]) carrito.push(productos[id]);
-                });
-
-                console.log('Carrito: ', carrito);
-                break;
-
-            case 2:
-                if (carrito.length === 0) {
-                    alert("El carrito está vacío.");
-                } else {
-                    alert("Carrito: " + carrito.join(', '));
-                }
-                console.log('Carrito nuevo: ', carrito)
-                break;
-
-            case 3:
-                eliminarProductoDelCarrito();
-                break;
-
-            default:
-                alert('Opción elegida incorrecta.');
-        }
-    } else {
-        alert('Gracias por usar el programa');
-    }
-
-} while (respuesta !== 4);
+renderProductos();
+renderCarrito();

@@ -1,13 +1,26 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Online Market</title>
+  <link rel="stylesheet" href="css/style.css"/>
 </head>
 <body>
-    <h1>Online market</h1>
-    <p>Este es un ecommerce de compra de alimentos y bebidas para el hogar.</p>
-    <script src="./js/main.js"></script>
+  <h1>Online Market</h1>
+  <p>Compra alimentos y bebidas para el hogar.</p>
+
+  <h2>Buscar productos</h2>
+  <input type="text" id="buscador" placeholder="Buscar por nombre...">
+
+  <h2>Productos disponibles</h2>
+  <div id="productos"></div>
+
+  <h2>Carrito</h2>
+  <ul id="carrito"></ul>
+  <p id="total"></p>
+  <button id="vaciarCarrito">Vaciar carrito</button>
+
+  <script src="js/main.js"></script>
 </body>
 </html>
