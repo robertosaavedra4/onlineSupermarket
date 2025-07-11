@@ -5,21 +5,24 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Online Market</title>
   <link rel="stylesheet" href="css/style.css"/>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
   <h1>Online Market</h1>
   <p>Compra alimentos y bebidas para el hogar.</p>
 
-  <h2>Buscar productos</h2>
-  <input type="text" id="buscador" placeholder="Buscar por nombre...">
+  <h2>Productos</h2>
+  <div id="productos" class="gridProductos"></div>
 
-  <h2>Productos disponibles</h2>
-  <div id="productos"></div>
+  <button id="btnCarrito" class="botonFlotante">🛒 Carrito</button>
 
-  <h2>Carrito</h2>
-  <ul id="carrito"></ul>
-  <p id="total"></p>
-  <button id="vaciarCarrito">Vaciar carrito</button>
+  <div id="panelCarrito" class="panelCarrito">
+    <button id="cerrarCarrito" class="cerrar">X</button>
+    <h2>Tu carrito</h2>
+    <ul id="carrito-lista"></ul>
+    <p id="total"></p>
+    <button id="finalizarCompra">Finalizar compra</button>
+  </div>
 
   <script src="js/main.js"></script>
 </body>
