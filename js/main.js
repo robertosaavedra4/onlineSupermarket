@@ -1,81 +1,123 @@
-const productos = [
-  { id: 1, nombre: 'Banana', precio: 200 },
-  { id: 2, nombre: 'Manzana', precio: 250 },
-  { id: 3, nombre: 'Naranja', precio: 180 },
-  { id: 4, nombre: 'Carne', precio: 1800 },
-  { id: 5, nombre: 'Pollo', precio: 1400 },
-  { id: 6, nombre: 'Gaseosa', precio: 700 },
-  { id: 7, nombre: 'Agua', precio: 400 }
-];
-
+let productos = [];
 let carrito = JSON.parse(localStorage.getItem('carrito')) || [];
 
 const contenedorProductos = document.getElementById('productos');
-const listaCarrito = document.getElementById('carrito');
-const btnVaciar = document.getElementById('vaciarCarrito');
-const inputBuscador = document.getElementById('buscador');
+const listaCarrito = document.getElementById('carrito-lista');
+const btnAbrirCarrito = document.getElementById('btnCarrito');
+const panelCarrito = document.getElementById('panelCarrito');
+const btnCerrarCarrito = document.getElementById('cerrarCarrito');
 const totalElemento = document.getElementById('total');
+const btnFinalizar = document.getElementById('finalizarCompra');
 
-function renderProductos(lista = productos) {
-  contenedorProductos.innerHTML = '';
-  lista.forEach(producto => {
-    const div = document.createElement('div');
-    div.innerHTML = `
-      <p><strong>${producto.nombre}</strong> - $${producto.precio}</p>
-      <button onclick="agregarAlCarrito(${producto.id})">Agregar</button>
-    `;
-    contenedorProductos.appendChild(div);
-  });
+function mostrarAlerta(mensaje, icono = "success") {
+    Swal.fire({
+        position: 'top-end',
+        icon: icono,
+        title: mensaje,
+        showConfirmButton: false,
+        timer: 1500
+    });
+}
+
+fetch('js/productos.json')
+    .then(response => response.json())
+    .then(data => {
+        productos = data;
+        renderProductos(productos);
+    });
+
+function renderProductos(lista) {
+    contenedorProductos.innerHTML = '';
+    lista.forEach(producto => {
+        const div = document.createElement('div');
+        div.innerHTML = `
+            <img src="${producto.imagen}" alt="${producto.nombre}" class="imgProducto"/>
+            <p><strong>${producto.nombre}</strong> - $${producto.precio}</p>
+            <button onclick="agregarAlCarrito(${producto.id})">Agregar</button>
+        `;
+        contenedorProductos.appendChild(div);
+    });
 }
 
 function renderCarrito() {
-  listaCarrito.innerHTML = '';
-  let total = 0;
+    listaCarrito.innerHTML = '';
+    let total = 0;
 
-  carrito.forEach((item, index) => {
-    total += item.precio * item.cantidad;
-    const li = document.createElement('li');
-    li.innerHTML = `
-      ${item.nombre} x${item.cantidad} - $${item.precio * item.cantidad}
-      <button onclick="eliminarDelCarrito(${index})">Eliminar</button>
-    `;
-    listaCarrito.appendChild(li);
-  });
+    carrito.forEach((item, index) => {
+        total += item.precio * item.cantidad;
+        const li = document.createElement('li');
+        li.innerHTML = `
+            <span>${item.nombre}</span> - $${item.precio * item.cantidad}
+            <div class="cantControles">
+                <button onclick="modificarCantidad(${index}, -1)">−</button>
+                <span>${item.cantidad}</span>
+                <button onclick="modificarCantidad(${index}, 1)">+</button>
+            </div>
+        `;
+        listaCarrito.appendChild(li);
+    });
 
-  totalElemento.textContent = `Total a pagar: $${total}`;
-  localStorage.setItem('carrito', JSON.stringify(carrito));
+    totalElemento.textContent = `Total: $${total}`;
+    localStorage.setItem('carrito', JSON.stringify(carrito));
 }
 
 function agregarAlCarrito(id) {
-  const producto = productos.find(p => p.id === id);
-  const itemEnCarrito = carrito.find(item => item.id === id);
+    const producto = productos.find(p => p.id === id);
+    const item = carrito.find(p => p.id === id);
 
-  if (itemEnCarrito) {
-    itemEnCarrito.cantidad++;
-  } else {
-    carrito.push({ ...producto, cantidad: 1 });
-  }
+    if (item) {
+        item.cantidad++;
+    } else {
+        carrito.push({ ...producto, cantidad: 1 });
+    }
 
-  renderCarrito();
+    renderCarrito();
+    mostrarAlerta("Producto agregado");
 }
 
-function eliminarDelCarrito(index) {
-  carrito.splice(index, 1);
-  renderCarrito();
+function modificarCantidad(index, delta) {
+    carrito[index].cantidad += delta;
+    if (carrito[index].cantidad <= 0) carrito.splice(index, 1);
+    renderCarrito();
 }
 
-btnVaciar.onclick = () => {
-  carrito = [];
-  renderCarrito();
+btnAbrirCarrito.onclick = () => {
+    panelCarrito.style.display = "flex";
 };
 
-inputBuscador.addEventListener('input', () => {
-  const texto = inputBuscador.value.toLowerCase();
-  const productosFiltrados = productos.filter(p =>
-    p.nombre.toLowerCase().includes(texto)
-  );
-  renderProductos(productosFiltrados);
-});
+btnCerrarCarrito.onclick = () => {
+    panelCarrito.style.display = "none";
+};
 
-renderProductos();
+btnFinalizar.onclick = () => {
+    if (carrito.length === 0) {
+        mostrarAlerta("Tu carrito está vacío", "warning");
+        return;
+    }
+
+    Swal.fire({
+        title: 'Finalizar compra',
+        html: `
+            <input id="nombre" class="swal2-input" placeholder="Nombre">
+            <input id="email" type="email" class="swal2-input" placeholder="Email">
+        `,
+        confirmButtonText: 'Comprar',
+        focusConfirm: false,
+        preConfirm: () => {
+            const nombre = document.getElementById('nombre').value;
+            const email = document.getElementById('email').value;
+            if (!nombre || !email) {
+                Swal.showValidationMessage('Por favor, completá todos los campos');
+            }
+            return { nombre, email };
+        }
+    }).then(result => {
+        if (result.isConfirmed) {
+            Swal.fire(`¡Gracias ${result.value.nombre}!`, 'Tu compra fue registrada.', 'success');
+            carrito = [];
+            renderCarrito();
+        }
+    });
+};
+
 renderCarrito();

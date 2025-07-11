@@ -1,0 +1,44 @@
+[
+  {
+    "id": 1,
+    "nombre": "Banana",
+    "precio": 200,
+    "imagen": "img/banana.png"
+  },
+  {
+    "id": 2,
+    "nombre": "Manzana",
+    "precio": 250,
+    "imagen": "img/manzana.jfif"
+  },
+  {
+    "id": 3,
+    "nombre": "Naranja",
+    "precio": 180,
+    "imagen": "img/naranja.jpg"
+  },
+  {
+    "id": 4,
+    "nombre": "Carne",
+    "precio": 1800,
+    "imagen": "img/carne.jfif"
+  },
+  {
+    "id": 5,
+    "nombre": "Pollo",
+    "precio": 1400,
+    "imagen": "img/pollo.jfif"
+  },
+  {
+    "id": 6,
+    "nombre": "Gaseosa",
+    "precio": 700,
+    "imagen": "img/gaseosa.png"
+  },
+  {
+    "id": 7,
+    "nombre": "Agua",
+    "precio": 400,
+    "imagen": "img/agua.jfif"
+  }
+]
